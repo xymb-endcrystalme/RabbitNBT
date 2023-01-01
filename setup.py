@@ -5,7 +5,7 @@ from pybind11 import get_cmake_dir
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 
 # The main interface is through Pybind11Extension.
 # * You can add cxx_std=11/14/17, and then build_ext can be removed.
@@ -17,7 +17,7 @@ __version__ = "0.0.1"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("python_example",
+    Pybind11Extension("rabbitnbt",
         ["src/main.cpp"],
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
@@ -25,12 +25,12 @@ ext_modules = [
 ]
 
 setup(
-    name="python_example",
+    name="rabbitnbt",
     version=__version__,
-    author="Sylvain Corlay",
-    author_email="sylvain.corlay@gmail.com",
-    url="https://github.com/pybind/python_example",
-    description="A test project using pybind11",
+    author="Xymb",
+    author_email="xymb@endcrystal.me",
+    url="https://github.com/xymb-endcrystalme/RabbitNBT",
+    description="Fast NBT library for Python",
     long_description="",
     ext_modules=ext_modules,
     extras_require={"test": "pytest"},
