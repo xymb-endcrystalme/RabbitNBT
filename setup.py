@@ -18,9 +18,10 @@ __version__ = "1.0.0"
 
 ext_modules = [
     Pybind11Extension("rabbitnbt",
-        ["src/main.cpp"],
+        ["src/main.cpp", "src/nbt_util.c", "src/nbt_treeops.c", "src/nbt_parsing.c", "src/nbt_loading.c", "src/buffer.c"],
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
+        extra_compile_args = ["-O3", "-fpermissive"]
         ),
 ]
 

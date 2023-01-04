@@ -1,5 +1,22 @@
+RabbitNBT
+==============
+
+54 times faster than https://github.com/twoolie/NBT
+On a 15MB NBT file from 8.087s to 0.149s
+
+Be careful, it's a very WIP and the API is subject to change.
+If you need some missing functionality, open an issue and I'll implement it. I quite literally only implemented parts that I needed myself.
+
+Example how to use:
+```
+pip install .
+python3 tests/test.py
+```
+
 python_example
 ==============
+
+Based on https://github.com/chmod222/cNBT
 
 [![Gitter][gitter-badge]][gitter-link]
 
