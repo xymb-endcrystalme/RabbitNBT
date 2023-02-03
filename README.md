@@ -9,6 +9,7 @@ If you need some missing functionality, open an issue and I'll implement it. I q
 
 Example how to use:
 ```
+export DEB_PYTHON_INSTALL_LAYOUT=deb_system
 pip install .
 python3 tests/test.py
 ```
