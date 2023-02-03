@@ -61,3 +61,5 @@ for tag in listtag.iterate():
 #    print(tag.list())
 #    print(rabbitnbt.NBTCompoundTag(tag))
 #    print(issubclass(tag, rabbitnbt.NBTCompoundTag))
+
+# TODO NBTTagString test

@@ -140,9 +140,8 @@ std::vector<pybind11::object> NBTListTag::iterate() {
 //            printf("Compound\n");
             tags.push_back(pybind11::cast(NBTCompoundTag(rootObj, currentNode)));
         } else if (currentNode->type == TAG_STRING) {
+//            tags.push_back(pybind11::cast(NBTStringTag(rootObj, currentNode))); // TODO! ERRORS OUT
             tags.push_back(pybind11::cast(std::string(currentNode->payload.tag_string)));
-//            printf("String\n");
-//            tags.push_back(pybind11::cast(NBTCompoundTag(rootObj, currentNode)));
         } else {
             printf("Unknown\n");
         }
@@ -228,19 +227,19 @@ void NBTIntTag::set(int32_t value) {
 NBTStringTag::NBTStringTag(NBTRoot rootObj, nbt_node *node) {
     if (node == NULL)
         throw pybind11::value_error("Tag doesn't exist");
-    if (node->type != TAG_INT)
+    if (node->type != TAG_STRING)
         throw pybind11::value_error("Tag is not string");
 
     this->rootObj = rootObj;
     this->node = node;
 }
 
-string NBTStringTag::value() {
+std::string NBTStringTag::value() {
     return std::string(this->node->payload.tag_string);
 }
 
-void NBTStringTag::set(string value) {
-    this->node->payload.tag_string = value.c_str();
+void NBTStringTag::set(std::string value) {
+    this->node->payload.tag_string = strdup(value.c_str());
 }
 
 /*

@@ -94,4 +94,4 @@ public:
 
     std::string value();
     void set(std::string value);
-}
+};
