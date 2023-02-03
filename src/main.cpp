@@ -140,8 +140,8 @@ std::vector<pybind11::object> NBTListTag::iterate() {
 //            printf("Compound\n");
             tags.push_back(pybind11::cast(NBTCompoundTag(rootObj, currentNode)));
         } else if (currentNode->type == TAG_STRING) {
-//            tags.push_back(pybind11::cast(NBTStringTag(rootObj, currentNode))); // TODO! ERRORS OUT
-            tags.push_back(pybind11::cast(std::string(currentNode->payload.tag_string)));
+            tags.push_back(pybind11::cast(NBTStringTag(rootObj, currentNode))); // TODO! ERRORS OUT
+//            tags.push_back(pybind11::cast(std::string(currentNode->payload.tag_string)));
         } else {
             printf("Unknown\n");
         }
@@ -377,6 +377,10 @@ PYBIND11_MODULE(rabbitnbt, m) {
     pybind11::class_<NBTIntTag, NBTTag>(m, "NBTIntTag")
         .def("value", &NBTIntTag::value)
         .def("set", &NBTIntTag::set);
+
+    pybind11::class_<NBTStringTag, NBTTag>(m, "NBTStringTag")
+        .def("value", &NBTStringTag::value)
+        .def("set", &NBTStringTag::set);
 
 
     m.def("from_bytes", &NBTRoot::from_bytes);
