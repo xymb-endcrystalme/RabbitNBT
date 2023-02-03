@@ -50,6 +50,12 @@ public:
     NBTCompoundTag get_existing_compound(std::vector<std::string> path);
 
     std::vector<std::string> list_tags();
+
+    NBTCompoundTag compound();
+
+//    bool contains(std::string key);
+//    pybind11::object get(std::string key);
+//    std::vector<std::string> keys();
 };
 
 class NBTTag {
@@ -69,6 +75,7 @@ class NBTCompoundTag: public NBTTag {
 public:
     NBTCompoundTag(NBTRoot rootObj, nbt_node *node);
 
+    bool contains(std::string key);
     pybind11::object get(std::string key);
     std::vector<std::string> keys();
 };
@@ -80,3 +87,11 @@ public:
     int value();
     void set(int32_t value);
 };
+
+class NBTStringTag: public NBTTag {
+public:
+    NBTStringTag(NBTRoot rootObj, nbt_node *node);
+
+    std::string value();
+    void set(std::string value);
+}

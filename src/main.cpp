@@ -21,6 +21,10 @@ pybind11::bytes NBTRoot::to_bytes() {
     return std::string((const char*)buff.data, (size_t)buff.len);
 }
 
+NBTCompoundTag NBTRoot::compound() {
+    return NBTCompoundTag(*this, rootObj->root);
+}
+
 int64_t NBTRoot::get_int(std::vector<std::string> path) {
     if (path.size() == 0)
         throw pybind11::value_error();
@@ -135,6 +139,10 @@ std::vector<pybind11::object> NBTListTag::iterate() {
         } else if (currentNode->type == TAG_COMPOUND) {
 //            printf("Compound\n");
             tags.push_back(pybind11::cast(NBTCompoundTag(rootObj, currentNode)));
+        } else if (currentNode->type == TAG_STRING) {
+            tags.push_back(pybind11::cast(std::string(currentNode->payload.tag_string)));
+//            printf("String\n");
+//            tags.push_back(pybind11::cast(NBTCompoundTag(rootObj, currentNode)));
         } else {
             printf("Unknown\n");
         }
@@ -170,12 +178,27 @@ std::vector<std::string> NBTCompoundTag::keys() {
     return tags;
 }
 
-pybind11::object NBTCompoundTag::get(std::string key) {
+bool NBTCompoundTag::contains(std::string key) {
     const struct list_head* pos;
     list_for_each(pos, &node->payload.tag_list->entry) {
         nbt_node *currentNode = list_entry(pos, struct nbt_list, entry)->data;
         if (key == currentNode->name)
-            return pybind11::cast(NBTIntTag(rootObj, currentNode));
+            return true;
+    }
+    return false;
+}
+
+pybind11::object NBTCompoundTag::get(std::string key) {
+    const struct list_head* pos;
+    list_for_each(pos, &node->payload.tag_list->entry) {
+        nbt_node *currentNode = list_entry(pos, struct nbt_list, entry)->data;
+        if (key == currentNode->name) {
+            if (currentNode->type == TAG_INT) return pybind11::cast(NBTIntTag(rootObj, currentNode));
+            else if (currentNode->type == TAG_COMPOUND) return pybind11::cast(NBTCompoundTag(rootObj, currentNode));
+            else if (currentNode->type == TAG_LIST) return pybind11::cast(NBTListTag(rootObj, currentNode));
+            else if (currentNode->type == TAG_STRING) return pybind11::cast(std::string(currentNode->payload.tag_string));
+            else throw pybind11::key_error("Unimplemented tag " + std::to_string(currentNode->type)); // TODO
+        }
 /*
         if (currentNode->type == TAG_INT) {
             return NBTInt
@@ -200,6 +223,24 @@ int NBTIntTag::value() {
 
 void NBTIntTag::set(int32_t value) {
     this->node->payload.tag_int = value;
+}
+
+NBTStringTag::NBTStringTag(NBTRoot rootObj, nbt_node *node) {
+    if (node == NULL)
+        throw pybind11::value_error("Tag doesn't exist");
+    if (node->type != TAG_INT)
+        throw pybind11::value_error("Tag is not string");
+
+    this->rootObj = rootObj;
+    this->node = node;
+}
+
+string NBTStringTag::value() {
+    return std::string(this->node->payload.tag_string);
+}
+
+void NBTStringTag::set(string value) {
+    this->node->payload.tag_string = value.c_str();
 }
 
 /*
@@ -318,7 +359,11 @@ PYBIND11_MODULE(rabbitnbt, m) {
         .def("to_bytes", &NBTRoot::to_bytes)
         .def("set_existing_int", &NBTRoot::set_existing_int)
         .def("get_existing_list", &NBTRoot::get_existing_list)
-        .def("list_tags", &NBTRoot::list_tags);
+        .def("list_tags", &NBTRoot::list_tags)
+
+//        .def("contains", &NBTRoot::contains)
+//        .def("get", &NBTRoot::get)
+        .def("compound", &NBTRoot::compound);
 
     pybind11::class_<NBTTag>(m, "NBTTag");
 
@@ -326,7 +371,8 @@ PYBIND11_MODULE(rabbitnbt, m) {
         .def("iterate", &NBTListTag::iterate);
 
     pybind11::class_<NBTCompoundTag, NBTTag>(m, "NBTCompoundTag")
-        .def("keys", &NBTCompoundTag::keys)
+        .def("contains", &NBTCompoundTag::contains)
+        .def("list", &NBTCompoundTag::keys)
         .def("get", &NBTCompoundTag::get);
 
     pybind11::class_<NBTIntTag, NBTTag>(m, "NBTIntTag")
